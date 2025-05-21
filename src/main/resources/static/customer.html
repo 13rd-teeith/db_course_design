@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户点餐系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/icons/font-awesome/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="assets/img/logo.png" alt="美食预约系统" height="40">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="customerName">用户</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>个人中心</a></li>
+                                <li><a class="dropdown-item" href="history.html"><i class="fas fa-history me-2"></i>预约历史</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <div class="container main-container">
+            <!-- 用户信息 -->
+            <!-- 此处移除头像和退出登录按钮，恢复原有布局 -->
+
+            <!-- 餐厅列表视图 -->
+            <div id="restaurantList" class="main-view">
+                <!-- 搜索和筛选 -->
+                <div class="search-section card shadow-sm mb-4">
+                    <div class="card-body">
+                        <form id="searchForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" id="searchKeyword" placeholder="搜索餐厅名称、菜系或地址">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="cuisineFilter">
+                                        <option value="all">全部菜系</option>
+                                        <option value="粤菜">粤菜</option>
+                                        <option value="川菜">川菜</option>
+                                        <option value="湘菜">湘菜</option>
+                                        <option value="江浙菜">江浙菜</option>
+                                        <option value="西餐">西餐</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="ratingFilter">
+                                        <option value="">评分不限</option>
+                                        <option value="4.5">4.5分以上</option>
+                                        <option value="4.0">4.0分以上</option>
+                                        <option value="3.5">3.5分以上</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary w-100">搜索</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 餐厅列表 -->
+                <h4 class="mb-3">推荐餐厅</h4>
+                <div class="row restaurant-container">
+                    <!-- 餐厅卡片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <!-- 餐厅详情视图 -->
+            <div id="restaurantDetail" class="main-view d-none">
+                <!-- 返回按钮 -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button class="btn btn-outline-secondary back-to-list">
+                        <i class="fas fa-arrow-left me-1"></i> 返回餐厅列表
+                    </button>
+                </div>
+
+                <!-- 餐厅基本信息 -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3 id="restaurantDetailName" class="mb-2">餐厅名称</h3>
+                                <div id="restaurantDetailRating" class="mb-2"></div>
+                                <p class="text-muted mb-2"><i class="fas fa-utensils me-2"></i><span id="restaurantDetailCuisine">菜系</span></p>
+                                <p class="text-muted mb-2"><i class="fas fa-map-marker-alt me-2"></i><span id="restaurantDetailAddress">地址</span></p>
+                                <p class="text-muted mb-2"><i class="fas fa-phone me-2"></i><span id="restaurantDetailPhone">电话</span></p>
+                                <p class="text-muted mb-2"><i class="fas fa-clock me-2"></i><span id="restaurantDetailHours">营业时间</span></p>
+                                <div class="mt-3">
+                                    <p id="restaurantDetailIntro">餐厅简介</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="panorama-container">
+                                    <img id="restaurantPanorama" src="" alt="餐厅全景" class="img-fluid rounded">
+                                    <button class="btn btn-outline-primary btn-sm mt-2 w-100" data-bs-toggle="modal" data-bs-target="#vrModal">
+                                        <i class="fas fa-vr-cardboard me-1"></i> 查看VR全景
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预约表单 -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- 餐桌选择 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">选择餐桌</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-legend mb-3">
+                                    <span class="table-legend-item available"><i class="fas fa-circle me-1"></i> 可预订</span>
+                                    <span class="table-legend-item occupied"><i class="fas fa-circle me-1"></i> 已占用</span>
+                                </div>
+                                <div class="row" id="tableSelection">
+                                    <!-- 餐桌将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 预约时间选择 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">选择时间</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="reservationDate" class="form-label">日期</label>
+                                        <input type="date" class="form-control" id="reservationDate">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="reservationTime" class="form-label">时间</label>
+                                        <select class="form-select" id="reservationTime">
+                                            <option value="11:00">11:00</option>
+                                            <option value="11:30">11:30</option>
+                                            <option value="12:00">12:00</option>
+                                            <option value="12:30">12:30</option>
+                                            <option value="13:00">13:00</option>
+                                            <option value="17:30">17:30</option>
+                                            <option value="18:00" selected>18:00</option>
+                                            <option value="18:30">18:30</option>
+                                            <option value="19:00">19:00</option>
+                                            <option value="19:30">19:30</option>
+                                            <option value="20:00">20:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="duration" class="form-label">用餐时长</label>
+                                        <select class="form-select" id="duration">
+                                            <option value="1">1小时</option>
+                                            <option value="2" selected>2小时</option>
+                                            <option value="3">3小时</option>
+                                            <option value="4">4小时</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="peopleCount" class="form-label">用餐人数</label>
+                                        <select class="form-select" id="peopleCount">
+                                            <option value="1">1人</option>
+                                            <option value="2" selected>2人</option>
+                                            <option value="3">3人</option>
+                                            <option value="4">4人</option>
+                                            <option value="5">5人</option>
+                                            <option value="6">6人</option>
+                                            <option value="7">7人</option>
+                                            <option value="8">8人</option>
+                                            <option value="9">9人</option>
+                                            <option value="10">10人</option>
+                                            <option value="more">10人以上</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 菜单选择 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">预点菜品</h5>
+                                <p class="small text-muted mb-0">您可以提前选择菜品，到店后可随时调整</p>
+                            </div>
+                            <div class="card-body">
+                                <div id="menuItems">
+                                    <!-- 菜单将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <!-- 预约摘要 -->
+                        <div class="sticky-top" style="top: 80px;">
+                            <div id="reservationSummary" class="mb-4">
+                                <!-- 预约摘要将通过JavaScript动态生成 -->
+                            </div>
+                            <div class="d-grid">
+                                <button id="submitReservation" class="btn btn-primary btn-lg" disabled>提交预约</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VR全景模态框 -->
+        <div class="modal fade" id="vrModal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">餐厅全景图</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="vr-container">
+                            <img src="assets/img/panorama_large.jpg" alt="餐厅全景" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer mt-5 py-3 bg-light">
+            <div class="container text-center">
+                <span class="text-muted">© 2025 美食之家数据库课设 版权所有</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 脚本引用 -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/customer.js"></script>
+</body>
+</html> 

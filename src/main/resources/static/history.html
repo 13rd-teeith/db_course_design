@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约历史 - 美食预约系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/icons/font-awesome/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="assets/img/logo.png" alt="美食预约系统" height="40">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="customer.html"><i class="fas fa-home me-1"></i>首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html"><i class="fas fa-user me-1"></i>个人中心</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="history.html"><i class="fas fa-history me-1"></i>预约历史</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i>退出登录</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <div class="container main-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">预约历史</h5>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary active" data-filter="all">全部</button>
+                                    <button type="button" class="btn btn-outline-primary" data-filter="upcoming">即将到来</button>
+                                    <button type="button" class="btn btn-outline-primary" data-filter="completed">已完成</button>
+                                    <button type="button" class="btn btn-outline-primary" data-filter="cancelled">已取消</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- 搜索和筛选 -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="搜索餐厅名称..." id="searchInput">
+                                        <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-end">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-outline-secondary" data-sort="date-desc">
+                                                <i class="fas fa-sort-amount-down me-1"></i>最新预约
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" data-sort="date-asc">
+                                                <i class="fas fa-sort-amount-up me-1"></i>最早预约
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 预约列表 -->
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>预约编号</th>
+                                            <th>餐厅名称</th>
+                                            <th>预约时间</th>
+                                            <th>用餐人数</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reservationList">
+                                        <!-- 预约记录将通过JavaScript动态加载 -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 分页 -->
+                            <nav aria-label="预约历史分页" class="mt-4">
+                                <ul class="pagination justify-content-center" id="pagination">
+                                    <!-- 分页将通过JavaScript动态加载 -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer mt-5 py-3 bg-light">
+            <div class="container text-center">
+                <span class="text-muted">© 2025 美食之家数据库课设 版权所有</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 预约详情模态框 -->
+    <div class="modal fade" id="reservationDetailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">预约详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="reservation-detail">
+                        <!-- 预约详情将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-danger" id="cancelReservationBtn">取消预约</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本引用 -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html> 

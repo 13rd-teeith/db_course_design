@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐厅管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/icons/font-awesome/css/all.min.css">
+    <style>
+        /* 布局优化样式 */
+        body {
+            padding-top: 70px;
+            background-color: #f8f9fa;
+        }
+        .main-container {
+            padding: 20px 0;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            overflow: hidden;
+        }
+        .card-header {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 0.75rem 1.25rem;
+        }
+        .stat-item {
+            padding: 10px;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .table-legend {
+            display: flex;
+            gap: 10px;
+        }
+        .legend-item {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        .table-status-item {
+            margin-bottom: 15px;
+        }
+        .modal-content {
+            border-radius: 0.5rem;
+            border: none;
+        }
+        .modal-header {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+        .footer {
+            margin-top: 2rem;
+            padding: 1.5rem 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        @media (max-width: 768px) {
+            .navbar-brand img {
+                height: 30px;
+            }
+            .card-header {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="assets/img/logo.png" alt="美食预约系统" height="40">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span id="restaurantName">餐厅名称</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>系统设置</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <div class="container main-container">
+            <!-- 接待视图 -->
+            <div id="receptionView" class="main-view">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">验证客户预约</h5>
+                            </div>
+                            <div class="card-body d-flex align-items-center">
+                                <form id="searchReservation" class="w-100">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="reservationId" placeholder="请输入预约编号">
+                                        <button class="btn btn-primary" type="submit">验证</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">营业统计</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-value text-primary">12</div>
+                                            <div class="stat-label">今日预约</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-value text-success">8</div>
+                                            <div class="stat-label">当前在座</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stat-item">
+                                            <div class="stat-value text-info">¥5680</div>
+                                            <div class="stat-label">今日营收</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-7">
+                        <!-- 预约列表 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center">
+                                <h5 class="mb-0 me-3">今日预约</h5>
+                                <div class="btn-group btn-group-sm mt-2 mt-sm-0">
+                                    <button type="button" class="btn btn-outline-secondary active">今日</button>
+                                    <button type="button" class="btn btn-outline-secondary">明日</button>
+                                    <button type="button" class="btn btn-outline-secondary">全部</button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>预约编号</th>
+                                                <th>客户姓名</th>
+                                                <th>联系方式</th>
+                                                <th>预约时间</th>
+                                                <th>人数/餐桌</th>
+                                                <th>状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reservationList">
+                                            <!-- 预约列表将通过JavaScript动态生成 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <!-- 餐桌状态 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-2">餐桌管理</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <form id="tableAvailabilityForm" class="d-flex flex-wrap align-items-center gap-2">
+                                        <div class="input-group" style="max-width: 160px;">
+                                            <input type="date" class="form-control form-control-sm" id="tableDate" value="">
+                                        </div>
+                                        <div class="input-group" style="max-width: 110px;">
+                                            <input type="time" class="form-control form-control-sm" id="tableTime" value="">
+                                        </div>
+                                        <div class="input-group" style="max-width: 110px;">
+                                            <select class="form-select form-select-sm" id="tablePeople">
+                                                <option value="2">2人</option>
+                                                <option value="3">3人</option>
+                                                <option value="4">4人</option>
+                                                <option value="6">6人</option>
+                                                <option value="8">8人</option>
+                                                <option value="10">10人</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-search me-1"></i>查询餐桌
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-legend mb-3">
+                                    <span class="legend-item bg-success text-white">空闲</span>
+                                    <span class="legend-item bg-warning text-white">已预约</span>
+                                    <span class="legend-item bg-danger text-white">使用中</span>
+                                </div>
+                                <div class="row g-3" id="tableStatus">
+                                    <!-- 餐桌状态将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 后厨视图 -->
+            <div id="kitchenView" class="main-view d-none">
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle me-3 fa-lg"></i>
+                            <span>当前有 <strong>2</strong> 个订单需要处理，请及时准备菜品。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">待处理订单</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="ordersList" class="row g-4">
+                                    <!-- 订单列表将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预约详情模态框 -->
+        <div class="modal fade" id="reservationDetailModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">预约详情</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <p><strong>预约编号：</strong><span id="detailReservationId"></span></p>
+                                <p><strong>客户姓名：</strong><span id="detailCustomerName"></span></p>
+                                <p><strong>联系方式：</strong><span id="detailPhone"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>预约时间：</strong><span id="detailTime"></span></p>
+                                <p><strong>用餐人数：</strong><span id="detailPeople"></span>人</p>
+                                <p><strong>预约餐桌：</strong><span id="detailTable"></span></p>
+                                <p><strong>状态：</strong><span id="detailStatus"></span></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>预点菜品</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>菜品名称</th>
+                                        <th>单价</th>
+                                        <th>数量</th>
+                                        <th>小计</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailDishes">
+                                    <!-- 菜品列表将通过JavaScript动态生成 -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3" class="text-end">总计</th>
+                                        <th id="detailTotal"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-success" id="confirmArrivalBtn">确认到店</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认到店模态框 -->
+        <div class="modal fade" id="confirmArrivalModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">确认客户到店</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                            <h4>确认客户已到店就餐?</h4>
+                            <p class="text-muted">确认后系统将通知后厨准备预点菜品</p>
+                        </div>
+                        <div class="alert alert-light border">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle text-primary fa-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>预约编号：</strong><span id="arrivalReservationId"></span></p>
+                                    <p class="mb-1"><strong>客户：</strong><span id="arrivalCustomerName"></span></p>
+                                    <p class="mb-0"><strong>餐桌：</strong><span id="arrivalTableName"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-success" id="confirmArrivalSubmitBtn">确认到店</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 完成订单模态框 -->
+        <div class="modal fade" id="completeOrderModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">确认订单完成</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-utensils text-primary fa-4x mb-3"></i>
+                            <h4>确认所有菜品已完成?</h4>
+                            <p class="text-muted">确认后将通知前台所有菜品已出餐</p>
+                        </div>
+                        <div class="alert alert-light border">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle text-primary fa-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>订单编号：</strong><span id="completeOrderId"></span></p>
+                                    <p class="mb-0"><strong>餐桌：</strong><span id="completeOrderTable"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" id="completeOrderSubmitBtn">确认完成</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加临时客户模态框 -->
+        <div class="modal fade" id="addWalkInModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">安排临时客户入座</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addWalkInForm">
+                            <div class="mb-3">
+                                <label for="walkInName" class="form-label">客户姓名</label>
+                                <input type="text" class="form-control" id="walkInName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="walkInPhone" class="form-label">联系电话</label>
+                                <input type="tel" class="form-control" id="walkInPhone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="walkInPeople" class="form-label">用餐人数</label>
+                                <select class="form-select" id="walkInPeople" required>
+                                    <option value="">请选择</option>
+                                    <option value="1">1人</option>
+                                    <option value="2">2人</option>
+                                    <option value="3">3人</option>
+                                    <option value="4">4人</option>
+                                    <option value="5">5人</option>
+                                    <option value="6">6人</option>
+                                    <option value="7">7人</option>
+                                    <option value="8">8人</option>
+                                    <option value="more">8人以上</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="walkInTable" class="form-label">选择餐桌</label>
+                                <select class="form-select" id="walkInTable" required>
+                                    <option value="">请选择</option>
+                                    <option value="2">大厅2号桌（4人）</option>
+                                    <option value="3">大厅3号桌（4人）</option>
+                                    <option value="5">包间2号（10人）</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary" form="addWalkInForm">确认入座</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 验证预约结果模态框 -->
+        <div class="modal fade" id="verifyReservationModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">验证预约结果</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="reservationFound" class="d-none">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                                <h4>预约验证成功</h4>
+                                <p class="text-muted">已找到客户预约信息</p>
+                            </div>
+                            <div class="alert alert-light border">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1"><strong>预约编号：</strong><span id="verifyReservationId"></span></p>
+                                        <p class="mb-1"><strong>客户：</strong><span id="verifyCustomerName"></span></p>
+                                        <p class="mb-1"><strong>预约时间：</strong><span id="verifyReservationTime"></span></p>
+                                        <p class="mb-0"><strong>餐桌：</strong><span id="verifyTableName"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="reservationNotFound" class="d-none">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-times-circle text-danger fa-4x mb-3"></i>
+                                <h4>预约未找到</h4>
+                                <p class="text-muted">未找到对应预约编号的预约信息</p>
+                            </div>
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                请检查预约编号是否正确，或联系客户确认预约信息。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary d-none" id="viewReservationDetailsBtn">查看详情</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结账离店模态框 -->
+        <div class="modal fade" id="checkoutModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">客户结账离店</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-receipt text-info fa-4x mb-3"></i>
+                            <h4>确认客户结账离店?</h4>
+                            <p class="text-muted">确认后将更新餐桌状态为空闲</p>
+                        </div>
+                        <div class="alert alert-light border">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-info-circle text-primary fa-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-1"><strong>餐桌：</strong><span id="checkoutTableName"></span></p>
+                                    <p class="mb-1"><strong>开始时间：</strong><span id="checkoutStartTime"></span></p>
+                                    <p class="mb-0"><strong>用餐时长：</strong><span id="checkoutDuration"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-info text-white" id="checkoutSubmitBtn">确认结账</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer mt-5 py-3 bg-light">
+            <div class="container text-center">
+                <span class="text-muted">© 2025 美食之家数据库课设 版权所有</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 脚本引用 -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/restaurant.js"></script>
+    <script>
+        // 餐桌查询相关脚本
+        $(document).ready(function() {
+            // 设置默认日期和时间
+            const setDefaultDateTime = () => {
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const currentTime = `${hours}:${minutes}`;
+                
+                $('#tableDate').val(today);
+                $('#tableTime').val(currentTime);
+            };
+            
+            // 页面加载时设置默认日期和时间
+            setDefaultDateTime();
+            
+            // 查询餐桌状态
+            const queryTableStatus = (event) => {
+                if (event) event.preventDefault();
+                
+                const restaurantId = 1; // 从登录信息中获取餐厅ID
+                const date = $('#tableDate').val();
+                const time = $('#tableTime').val();
+                const people = $('#tablePeople').val();
+                
+                // 显示加载状态
+                $('#tableStatus').html('<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">加载中...</span></div></div>');
+                
+                // 调用API获取餐桌状态
+                $.ajax({
+                    url: `/api/tables/restaurant/${restaurantId}/available`,
+                    method: 'GET',
+                    data: {
+                        date: date,
+                        time: time,
+                        people: people,
+                        duration: 2 // 默认时长2小时
+                    },
+                    success: function(response) {
+                        if (response.code === 200) {
+                            renderTableStatus(response.data);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '查询失败',
+                                text: response.message || '无法获取餐桌状态信息'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('获取餐桌状态失败:', xhr);
+                        Swal.fire({
+                            icon: 'error',
+                            title: '系统错误',
+                            text: '获取餐桌状态失败，请稍后再试'
+                        });
+                    }
+                });
+            };
+            
+            // 渲染餐桌状态
+            const renderTableStatus = (tables) => {
+                if (!tables || tables.length === 0) {
+                    $('#tableStatus').html('<div class="col-12 text-center"><p class="text-muted">没有找到符合条件的餐桌</p></div>');
+                    return;
+                }
+                
+                let html = '';
+                tables.forEach(table => {
+                    // 确定餐桌状态对应的样式
+                    let statusClass = '';
+                    let statusText = '';
+                    
+                    switch(table.status) {
+                        case 'available':
+                            statusClass = 'bg-success';
+                            statusText = '空闲';
+                            break;
+                        case 'reserved':
+                            statusClass = 'bg-warning';
+                            statusText = '已预约';
+                            break;
+                        case 'occupied':
+                            statusClass = 'bg-danger';
+                            statusText = '使用中';
+                            break;
+                        case 'timeslot_unavailable':
+                            statusClass = 'bg-warning';
+                            statusText = '时段已约';
+                            break;
+                        default:
+                            statusClass = 'bg-secondary';
+                            statusText = '未知';
+                    }
+                    
+                    html += `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card ${statusClass} text-white">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">${table.name}</h5>
+                                        <span class="badge bg-white text-dark">${table.capacity}人桌</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span>${statusText}</span>
+                                        ${table.status === 'available' ? 
+                                            `<button class="btn btn-sm btn-light" 
+                                                data-table-id="${table.id}" 
+                                                data-table-name="${table.name}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#addWalkInModal">
+                                                安排入座
+                                            </button>` : 
+                                            ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                $('#tableStatus').html(html);
+            };
+            
+            // 绑定查询表单提交事件
+            $('#tableAvailabilityForm').on('submit', queryTableStatus);
+            
+            // 页面加载时查询一次
+            queryTableStatus();
+        });
+    </script>
+</body>
+</html> 
